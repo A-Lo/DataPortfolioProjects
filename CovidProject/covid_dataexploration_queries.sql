@@ -1,4 +1,12 @@
-SELECT COUNT(index) 
+/*
+Covid 2022 Data Exploration
+
+Skills used: Joins, CTE's, Temp Tables, Windows Functions(PARTITION, COALESCE,etc), Aggregate Functions,
+						Creating Views, Converting Data Types, 
+
+*/
+
+SELECT COUNT(index)
 FROM public."CovidDeaths";
 
 
@@ -6,24 +14,24 @@ FROM public."CovidDeaths";
 
 SELECT	Location, date, total_cases, new_cases, total_deaths, population
 FROM 	public."CovidDeaths"
-WHERE 	continent is not null 
+WHERE 	continent is not null
 ORDER BY 1,2;
 
 
 -- 2)	Total Cases vs Total Deaths
 --		Shows likelihood of dying if you contract covid in your country
 
-SELECT 	location, date, total_cases,total_deaths, 
+SELECT 	location, date, total_cases,total_deaths,
 		(total_deaths/total_cases)*100 as DeathPercentage
 FROM 	public."CovidDeaths"
-WHERE  	LOWER(location) LIKE '%states%' and(continent is not null) 
+WHERE  	LOWER(location) LIKE '%states%' and(continent is not null)
 ORDER 	BY 1,2;
 
 
 -- 3)	Total Cases vs Population
 --		Shows what percentage of population infected with Covid, per day
 
-SELECT 	Location, date, Population, 
+SELECT 	Location, date, Population,
 		total_cases,  (total_cases/population)*100 as PercentPopulationInfected
 FROM 	public."CovidDeaths"
 --WHERE location ILIKE '%states%'
@@ -32,7 +40,7 @@ ORDER BY 1,2;
 
 -- 4)	Countries, using their Highest Infection Rate, compared to population
 
-SELECT	location, MAX(total_cases) as highest_infection_count, 
+SELECT	location, MAX(total_cases) as highest_infection_count,
 		population, MAX((total_cases/population)*100) as PercentPopulationInfected
 FROM 	public."CovidDeaths"
 GROUP BY location, population
@@ -50,25 +58,25 @@ WITH temp1 as (
 	GROUP BY  location
 )
 SELECT 	location, TotalDeathCount -- Can just use *, to avoid redundancy
-FROM 	temp1 
-WHERE	(TotalDeathCount IS NOT NULL) 
+FROM 	temp1
+WHERE	(TotalDeathCount IS NOT NULL)
 ORDER BY TotalDeathCount DESC;
 
 
 
 -- 6) 	By continent: Showing contintents with the highest death count per population
---		Using CTE, and than Window functions 
+--		Using CTE, and than Window functions
 
 WITH ConDeaths AS
-(	SELECT	continent, location, 
+(	SELECT	continent, location,
 		MAX(cast(total_deaths as bigint)) as TotalDeathCount
 			--OVER (PARTITION BY continent, location ) as TotalDeathCount
 	FROM public."CovidDeaths"
-	WHERE (continent IS NOT NULL) 
+	WHERE (continent IS NOT NULL)
  	GROUP BY continent, location
 )
 SELECT continent, SUM(TotalDeathCOUNT) as TotalContinentDeath
-FROM ConDeaths 
+FROM ConDeaths
 WHERE TotalDeathCount IS NOT NULL
 GROUP BY continent
 ORDER BY ContinentDeath DESC;
@@ -79,19 +87,19 @@ ORDER BY ContinentDeath DESC;
 
 --		Using CTE for readability
 WITH T2 AS (
-	SELECT	 SUM(cast(new_cases as bigint)) as total_cases, 
+	SELECT	 SUM(cast(new_cases as bigint)) as total_cases,
 			SUM(cast(new_deaths as bigint)) as total_deaths
 	FROM 	public."CovidDeaths"
 	WHERE 	continent IS NOT NULL
 )
-SELECT 	total_cases, total_deaths, 
+SELECT 	total_cases, total_deaths,
 		(total_deaths/total_cases)*100 as DeathPercentage
 FROM 	T2
 ORDER BY 1,2;
 
 
 --Alternate (7)
-SELECT 	SUM(cast(new_cases as bigint)) as total_cases, 
+SELECT 	SUM(cast(new_cases as bigint)) as total_cases,
 		SUM(cast(new_deaths as bigint)) as total_deaths,
 		(SUM(cast(new_deaths as bigint))/SUM(cast(new_cases as bigint)))*100 as DeathPercentage
 FROM	public."CovidDeaths"
@@ -121,11 +129,11 @@ ORDER BY 2,3;
 
 WITH PopvsVac AS (
 SELECT 	dea.continent, dea.location, dea.date, dea.population,vac.new_vaccinations,
-		SUM(CAST(vac.new_vaccinations as int)) 
+		SUM(CAST(vac.new_vaccinations as int))
 			OVER (PARTITION BY dea.location ORDER BY dea.location, dea.date) as RollingPeopleVaccinated
 FROM public."CovidDeaths" dea
 JOIN public."CovidVaccination_2021" vac
-ON dea.location = vac.location and dea.date = vac.date 
+ON dea.location = vac.location and dea.date = vac.date
 WHERE dea.continent IS NOT NULL
 ORDER BY 2,3
 )
@@ -142,7 +150,7 @@ FROM PopvsVac;
 DROP TABLE if exists PercentPopulationVaccinated;
 CREATE TEMP TABLE PercentPopulationVaccinated AS
 SELECT 	dea.continent, dea.location, dea.date, dea.population,vac.new_vaccinations,
-		SUM(CAST(vac.new_vaccinations as int)) 
+		SUM(CAST(vac.new_vaccinations as int))
 			OVER (PARTITION BY dea.location ORDER BY dea.location, dea.date) as RollingPeopleVaccinated
 FROM public."CovidDeaths" dea
 JOIN public."CovidVaccination_2021" vac
@@ -157,15 +165,12 @@ FROM PercentPopulationVaccinated;
 
 CREATE VIEW IF NOT EXISTS PercentPopulationVaccinated AS
 (SELECT 	dea.continent, dea.location, dea.date, dea.population,vac.new_vaccinations,
-		SUM(CAST(vac.new_vaccinations as int)) 
+		SUM(CAST(vac.new_vaccinations as int))
 			OVER (PARTITION BY dea.location ORDER BY dea.location, dea.date) as RollingPeopleVaccinated
 FROM public."CovidDeaths" dea
 JOIN public."CovidVaccination_2021" vac
 ON dea.location = vac.location and dea.date = vac.date);
 
--- Deletes the view 
+-- Deletes the view
 
 DROP VIEW public.PercentPopulationVaccinated CASCADE;
-
-
-

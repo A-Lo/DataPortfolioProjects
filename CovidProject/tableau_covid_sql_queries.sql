@@ -62,3 +62,24 @@ WHERE	Lower(location) NOT LIKE '%income%'
 	--and date_trunc('year', cast(date AS date)) = 2020
 	--and (EXTRACT(year from cast(date as date)) = 2020)
 ORDER BY   date DESC;
+
+
+--6) NEW:
+-- Population Fully Vaccinated
+SELECT	vac.continent, vac.location, vac.date,
+				COALESCE(vac.people_fully_vaccinated,0) as people_fully_vaccinated,
+				dea.population,
+				(vac.people_fully_vaccinated/dea.population)* 100 as population_fully_vaccinated_percent
+FROM public."CovidVaccinations_2022" vac
+JOIN public."CovidDeaths_2022" dea
+ON	vac.date = dea.date AND vac.continent = dea.continent
+	AND  vac.location = dea.location
+WHERE vac.continent IS NOT NULL
+--AND lower(vac.location) like '%states'
+ORDER BY people_fully_vaccinated DESC;
+
+-- Checking to see if locations like 'low income' doesn't show up from the location column
+-- select distinct continent, location
+-- from public."CovidVaccinations_2022"
+-- WHERE continent IS NOT NULL
+-- group by continent, location;
