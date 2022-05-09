@@ -1,6 +1,7 @@
-# Movie Rating's Project:
+<h1 align = 'center'> Movie Rating Project: </h1>
 
-Explores the datasets containing Fandango and additional movie sites that provide movie ratings; gain insight in movie rating bias committed by Fandango.
+<p align = "center">Explores the datasets containing Fandangos and additional movie sites that provide movie ratings; gain insight in movie rating bias committed by Fandango. </p>
+
 ---
 **Skills used:**
 
