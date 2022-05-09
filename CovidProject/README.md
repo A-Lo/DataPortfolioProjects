@@ -11,13 +11,17 @@
     
 [Tableau queries](./tableau_covid_sql_queries.sql): Select queries that filters the large dataset to create a Tableau Covid Dashboard.
 
-**The SQL skills used are:**
+**Skills used:**
+- SQL (PostgreSQL): 
+    - Joins
+    -  CTE's
+    -  Temp Tables
+    -  Windows Functions(PARTITION, COALESCE,etc), 
+    -  Aggregate Functions,
+    -  Creating Views
+    -  Converting Data Types
 
-- Joins
--  CTE's
--  Temp Tables
--  Windows Functions(PARTITION, COALESCE,etc), 
--  Aggregate Functions,
--  Creating Views
--  Converting Data Types
-
+- Python:
+    - Pandas 
+    - Sql_Alchemy (Engine to interact with Database)
+    
