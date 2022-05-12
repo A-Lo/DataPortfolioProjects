@@ -3,6 +3,9 @@
 <p align = "center">Explores the datasets containing Fandangos and additional movie sites that provide movie ratings; gain insight in movie rating bias committed by Fandango. </p>
 
 ---
+
+[VIEW Plots from data analysis and data manipulation](Move_Review_Analysis_Project.ipynb)
+
 **Skills used:**
 
 - CSV, Excel 
