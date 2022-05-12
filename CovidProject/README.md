@@ -25,3 +25,5 @@
     - Pandas 
     - Sql_Alchemy (Engine to interact with Database)
     
+
+![Covid DashBoard](covid_dashboard2022.png)
